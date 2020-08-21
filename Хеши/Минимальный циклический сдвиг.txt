@@ -1,0 +1,104 @@
+//#pragma comment(linker, "/stack:200000000")
+//#pragma GCC optimize("Ofast,unroll-loops,no-stack-protector,fast-math") 
+////#pragma GCC target("sse,sse2,sse3,ssse3,sse4") // RE
+#define _CRT_SECURE_NO_WARNINGS // - for VisualStudio: do not disturb about warnings
+#define _USE_MATH_DEFINES
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <set>
+#include <algorithm>
+#include <fstream>
+#include <cmath>
+#include <deque>
+#include <list>
+#include <stack>
+#include <queue>
+#include <iomanip>
+#include <cassert>
+#include <functional>
+#include <ctime>
+#include <unordered_map>
+#include <unordered_set>
+#include <bitset>
+#include <climits>
+
+using namespace std;
+#define open_streams ifstream fin("brackets.in");ofstream fout("brackets.out")
+#define close_streams fin.close();fout.close()
+#define speed cout.tie(0);cin.tie(0);ios_base::sync_with_stdio(0)
+#define pus system("pause");
+#define ll long long
+#define ull unsigned long long
+#define all(a) a.begin(),a.end()
+#define rall(a) a.rbegin(),a.rend()
+#define mp(a,b) make_pair(a,b)
+#define pb(X) push_back(X)
+#define eps 1e-9
+const double PI = M_PI;
+const int INF = 2 * 1e9;
+const ll limit = 1 * 1e12;
+const int mod = 1e9 + 9;
+const int MOD = 1e9 + 711;
+const int MOD2 = 1e9 + 933;
+const int MOD3 = 1e9 + 993;
+//---------------------------------------------------------------------------
+const int maxn = 2e5 + 10;
+
+
+
+
+const int base = 419;
+vector<ll> p(maxn);
+vector<ll> hh;
+void build_hh(string &s) {
+	p[0] = 1;
+	for (int i = 0; i < s.size(); ++i) {
+		hh[i + 1] = (hh[i] * base + s[i]) % MOD;
+		p[i + 1] = (p[i] * base) % MOD;
+	}
+}
+ll get_hh(int l, int r) {
+	return (hh[r] + MOD - (hh[l - 1] * p[r - l + 1]) % MOD) % MOD;
+}
+// cords of min string : left,right
+// cords of current string : l,r
+int n;
+bool check(string &s, int l, int r, int left, int right) {
+	int lb = 0, rb = n - 1, m,last = -1;
+	while (lb <= rb) {
+		m = (lb + rb) / 2;
+		ll hh_mi = get_hh(left + 1, left + m + 1);
+		ll hh_cur = get_hh(l + 1, l + m + 1);
+		if (hh_mi == hh_cur) {
+			lb = m + 1;
+			last = m;
+		}
+		else {
+			rb = m - 1;
+		}
+	}
+	++last;
+	return s[l + last] < s[left + last];
+}
+int main() {
+	speed;
+	string s,mi;
+	cin >> s;
+	n = s.size();
+	s = s + s;
+	hh = vector<ll>(s.size() + 1);
+	build_hh(s);
+	int left = 0, right = n - 1;
+	for (int i = 0; i < s.size() / 2; ++i) {
+		if (check(s, i, i + n - 1, left, right)) {
+			left = i, right = i + n - 1;
+		}
+	}
+	for (int i = left; i <= right; ++i) {
+		cout << s[i];
+	}
+	cerr << "\n\nTime elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s.\n";
+	return 0;
+}

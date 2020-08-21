@@ -1,0 +1,112 @@
+//#pragma comment(linker, "/stack:200000000")
+//#pragma GCC optimize("Ofast,unroll-loops,no-stack-protector") 
+////#pragma GCC target("sse,sse2,sse3,ssse3,sse4") // RE
+#define _CRT_SECURE_NO_WARNINGS // - for VisualStudio: do not disturb about warnings
+#define _USE_MATH_DEFINES
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <set>
+#include <algorithm>
+#include <fstream>
+#include <cmath>
+#include <deque>
+#include <list>
+#include <stack>
+#include <queue>
+#include <iomanip>
+#include <cassert>
+#include <functional>
+#include <ctime>
+#include <unordered_map>
+#include <unordered_set>
+#include <bitset>
+#include <climits>
+
+using namespace std;
+#define open_streams ifstream fin("brackets.in");ofstream fout("brackets.out")
+#define close_streams fin.close();fout.close()
+#define speed cout.tie(0);cin.tie(0);ios_base::sync_with_stdio(0)
+#define pus system("pause");
+#define ll long long
+#define ull unsigned long long
+#define all(a) a.begin(),a.end()
+#define rall(a) a.rbegin(),a.rend()
+#define mp(a,b) make_pair(a,b)
+#define pb(X) push_back(X)
+#define eps 1e-9
+const double PI = M_PI;
+const int INF = 1 * 1e9;
+const ll limit = 1 * 1e12;
+const int mod = 1e9 + 9;
+const int MOD = 1e9 + 711;
+const int MOD2 = 1e9 + 933;
+const int MOD3 = 1e9 + 993;
+//---------------------------------------------------------------------------
+const int maxn = 2e5 + 10;
+
+
+
+const int base = 419;
+vector<ll> p(100001);
+void build_hh(string &s, vector<ll> &hh) {
+	p[0] = 1;
+	for (int i = 0; i < s.size(); ++i) {
+		hh[i + 1] = (hh[i] * base + s[i])%MOD;
+		p[i + 1] = (p[i] * base) % MOD;
+	}
+}
+ll get_hh(int l, int r, vector<ll> &hh) {
+	return (hh[r] + MOD - (hh[l - 1] * p[r - l + 1]) % MOD) % MOD;
+}
+int main() {
+	speed;
+	string s, t;
+	cin >> s;
+	t = s;
+	reverse(all(t));
+	vector<ll> hh(s.size() + 1), hh_rev(t.size() + 1);
+	build_hh(s, hh);
+	build_hh(t, hh_rev);
+	ll cnt = 0;
+	for (int i = 0; i < s.size(); ++i) {
+		int l = i, r = i +  min(i, int(s.size()) - i - 1),m;
+		int mx = 0;
+		while (l <= r) {
+			m = (l + r) / 2;
+			int l2 = s.size() -i - 1;
+			int r2 = s.size() - (2*i - m) - 1;
+			ll h1 = get_hh(i + 1, m + 1, hh);
+			ll h2 = get_hh(l2 + 1, r2 + 1, hh_rev);
+			if (h1 == h2) {
+				mx = max(mx, m - i + 1);
+				l = m + 1;
+			}
+			else {
+				r = m - 1;
+			}
+		}
+		cnt += mx;
+		mx = 0;
+		l = i, r = i + min((int)s.size() - i - 1, i-1);
+		while (l <= r) {
+			m = (l + r) / 2;
+			int l2 = s.size() - i;
+			int r2 = s.size() - (i - (m-i) - 1) - 1;
+			ll h1 = get_hh(i + 1, m + 1, hh);
+			ll h2 = get_hh(l2 + 1, r2 + 1, hh_rev);
+			if(h1==h2) {
+				mx = max(mx, m - i + 1);
+				l = m + 1;
+			}
+			else {
+				r = m - 1;
+			}
+		}
+		cnt += mx;
+	}
+	cout << cnt;
+	cerr << "\n\nTime elapsed: " << 1.0 * clock() / CLOCKS_PER_SEC << " s.\n";
+	return 0;
+}
